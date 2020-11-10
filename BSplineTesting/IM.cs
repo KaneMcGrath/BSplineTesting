@@ -111,18 +111,20 @@ namespace BSplineTesting
 
         public static int MouseX() // gets mouse position in window pixels
         {
+            Rectangle bounds = Program.mainWindow.ClientRectangle;
+            
             int x = Mouse.GetCursorState().X - Program.mainWindow.X;
             if (x < 0) x = 0;
-            else if (x > Program.mainWindow.X + Program.mainWindow.Width) x = Program.mainWindow.X + Program.mainWindow.Width;
+            else if (x > bounds.Width) x = bounds.X + bounds.Width;
             return x;
         }
 
         public static int MouseY()
         {
+            Rectangle bounds = Program.mainWindow.ClientRectangle;
             int y = Mouse.GetCursorState().Y - Program.mainWindow.Y - 32;
             if (y < 0) y = 0;
-            else if (y > Program.mainWindow.Y + Program.mainWindow.Height) y = Program.mainWindow.Y + Program.mainWindow.Height;
-            
+            else if (y > bounds.Height) y = bounds.Y + bounds.Height;
             return y;
         }
 
