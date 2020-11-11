@@ -3,6 +3,8 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 using System.Text;
+using System.Drawing;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BSplineTesting
 {
@@ -24,7 +26,7 @@ namespace BSplineTesting
             }
             drawLine(points);
         }
-
+        
 
 
         public static void drawLine(Vector2[] points) //Draws a connected line segment between points
@@ -35,6 +37,36 @@ namespace BSplineTesting
                 GL.Vertex2(point);
             }
             GL.End();
+        }
+        public static void drawLine(Vector2[] points,Color c) //Draws a connected line segment between points
+        {
+            GL.Begin(PrimitiveType.LineStrip);
+            GL.Color3(c);
+            foreach (Vector2 point in points)
+            {
+                GL.Vertex2(point);
+            }
+            GL.Color3(Color.White);
+            GL.End();
+        }
+
+        public static void drawSpline(Spline s)
+        {
+
+            drawLine(new Vector2[] { s.GlobalLeft(), s.position, s.GlobalRight() });
+            LineCircle(s.position, 0.01f, 10);
+            LineCircle(s.GlobalLeft(), 0.01f, 10);
+            LineCircle(s.GlobalRight(), 0.01f, 10);
+
+        }
+
+        public static void drawLineCurve(Line l, int resolution)
+        {
+            Vector2[] v = l.getPoints();
+            for(int i = 0; i < v.Length - 1; i += 3)
+            {
+                drawLine(Bezier.SimpleBezierCurve(v[i], v[i + 1], v[i + 2], v[i + 3], resolution));
+            }
         }
     }
 }

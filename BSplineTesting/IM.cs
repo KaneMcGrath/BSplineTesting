@@ -16,7 +16,7 @@ namespace BSplineTesting
         private static Dictionary<Key, bool> pressedKeys = new Dictionary<Key, bool>();
         private static Dictionary<Key, bool> DownKeys = new Dictionary<Key, bool>();
         private static Dictionary<Key, bool> UpKeys = new Dictionary<Key, bool>();
-
+        private static Dictionary<MouseButton, bool> mouseButtons = new Dictionary<MouseButton, bool>();
 
 
         static IM()
@@ -45,24 +45,28 @@ namespace BSplineTesting
             if (!pressedKeys[k])
             DownKeys[k] = true;
             pressedKeys[k] = true;
-            
-            
         }
         public static void OnKeyUp(Key k)
         {
             pressedKeys[k] = false;
         }
-       
+        public static void OnMouseButtonDown(MouseButton b)
+        {
+            mouseButtons[b] = true;
+        }
+        public static void OnMouseButtonUp(MouseButton b)
+        {
+            mouseButtons[b] = false;
+        }
+
 
 
         //Called before the game manager update
         //sets down keys if they are pressed
         public static void Update()
         {
-            foreach (Key k in pressedKeys.Keys.ToArray())
-            {
-                
-            }
+           // foreach (Key k in pressedKeys.Keys.ToArray())
+            
             
         }
 
@@ -109,6 +113,17 @@ namespace BSplineTesting
             return UpKeys[k];
         }
 
+        public static bool MouseButtonDown(MouseButton b)
+        {
+
+            return true;
+        }
+
+        public static bool MouseButtonUp(MouseButton b)
+        {
+
+            return true;
+        }
         public static int MouseX() // gets mouse position in window pixels
         {
             Rectangle bounds = Program.mainWindow.ClientRectangle;
@@ -130,12 +145,8 @@ namespace BSplineTesting
 
         public static Vector2 Pix2Vec(int x, int y)
         {
-
             var width = Program.mainWindow.Width;
             var height = Program.mainWindow.Height;
-
-
-
             return new Vector2(((((float)x / width)-0.5f)*2f),(-((float) y / height)+0.5f)*2f);
         }
 

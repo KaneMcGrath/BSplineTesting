@@ -77,5 +77,15 @@ namespace BSplineTesting
         {
             IM.OnKeyUp(e.Key);
         }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            IM.OnMouseButtonDown(e.Button);
+        }
+
+        protected override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            IM.OnMouseButtonUp(e.Button);
+        }
     }
 }
