@@ -27,6 +27,8 @@ namespace BSplineTesting
         {
             // really lazy fix later
 
+            if (splines.Count == 0) return new Vector2[0];
+
             Vector2[] s = new Vector2[splines.Count*3];
             for(int i = 0; i < splines.Count; i++)
             {

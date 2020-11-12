@@ -57,7 +57,16 @@ namespace BSplineTesting
 
         public void moveControlPoint(Vector2 pos, bool left) //moves opposing controlpoint as well
         {
-
+            if (left)
+            {
+                leftPos = new Vector2(pos.X - position.X, pos.Y - position.Y);
+                rightPos = new Vector2(-leftPos.X, -leftPos.Y);
+            }
+            else
+            {
+                rightPos = new Vector2(pos.X - position.X, pos.Y - position.Y);
+                leftPos = new Vector2(-rightPos.X, -rightPos.Y);
+            }
         }
         public Vector2 GlobalLeft()
         {

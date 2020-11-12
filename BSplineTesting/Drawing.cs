@@ -13,7 +13,11 @@ namespace BSplineTesting
         {
             this.lines.AddRange(lines);
         }
-        
+        public Drawing()
+        {
+            this.lines.AddRange(lines);
+        }
+
         public Line[] getLines()
         {
             return this.lines.ToArray();
