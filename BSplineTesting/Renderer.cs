@@ -10,7 +10,9 @@ namespace BSplineTesting
 {
     static class Renderer
     {
-        public static void LineCircle(Vector2 pos, float rad, int res) //draws a circle out of lines centered on pos, with rad radius and with res number of points
+
+        //draws a circle out of lines centered on pos, with rad radius and with res number of points
+        public static void LineCircle(Vector2 pos, float rad, int res) 
         {
 
             Vector2[] points = new Vector2[res + 1];
@@ -26,7 +28,9 @@ namespace BSplineTesting
             }
             drawLine(points);
         }
-        public static void LineCircle(Vector2 pos, float rad, int res, Color c) //draws a circle out of lines centered on pos, with rad radius and with res number of points
+
+        //draws a circle out of lines centered on pos, with rad radius and with res number of points
+        public static void LineCircle(Vector2 pos, float rad, int res, Color c) 
         {
 
             Vector2[] points = new Vector2[res + 1];
@@ -44,8 +48,8 @@ namespace BSplineTesting
         }
 
 
-
-        public static void drawLine(Vector2[] points) //Draws a connected line segment between points
+        //Draws a connected line segment between points
+        public static void drawLine(Vector2[] points) 
         {
             GL.Begin(PrimitiveType.LineStrip);
             foreach (Vector2 point in points)
@@ -54,7 +58,9 @@ namespace BSplineTesting
             }
             GL.End();
         }
-        public static void drawLine(Vector2[] points,Color c) //Draws a connected line segment between points
+
+        //Draws a connected line segment between points now in color
+        public static void drawLine(Vector2[] points,Color c) 
         {
             GL.Begin(PrimitiveType.LineStrip);
             GL.Color3(c);
@@ -76,12 +82,40 @@ namespace BSplineTesting
 
         }
 
+        public static void drawSpline(Spline s, Color c)
+        {
+
+            drawLine(new Vector2[] { s.GlobalLeft(), s.position, s.GlobalRight() }, c);
+            LineCircle(s.position, 0.01f, 10, c);
+            LineCircle(s.GlobalLeft(), 0.01f, 10, c);
+            LineCircle(s.GlobalRight(), 0.01f, 10, c);
+
+        }
+
         public static void drawLineCurve(Line l, int resolution)
         {
+
             Vector2[] v = l.getPoints();
             for(int i = 0; i < v.Length - 1; i += 3)
             {
                 drawLine(Bezier.SimpleBezierCurve(v[i], v[i + 1], v[i + 2], v[i + 3], resolution));
+            }
+        }
+        public static void drawShape(Shape s, int resolution)
+        {
+            Vector2[] v = s.getPoints();
+            for (int i = 0; i < v.Length - 1; i += 3)
+            {
+                drawLine(Bezier.SimpleBezierCurve(v[i], v[i + 1], v[i + 2], v[i + 3], resolution));
+            }
+        }
+
+        public static void drawDrawing(Drawing d, int resolution)
+        {
+            Line[] l = d.getLines();
+            for (int i = 0; i < l.Length; i++)
+            {
+                drawLineCurve(l[i], resolution);
             }
         }
     }

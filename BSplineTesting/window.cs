@@ -17,6 +17,7 @@ namespace BSplineTesting
         {
             TargetRenderFrequency = 120;
             TargetUpdateFrequency = 120;
+            
             MKII = new KaneGameManagerMKII();
             KaneGameManagerMKII.instance = MKII;
         }
@@ -66,6 +67,12 @@ namespace BSplineTesting
             MKII.Update();
             MKII.LateUpdate();
             IM.LateUpdate();
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            GL.Viewport(0, 0, Program.mainWindow.Width, Program.mainWindow.Height);
+            
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
