@@ -96,5 +96,10 @@ namespace BSplineTesting
         {
             return new Vector2[] { GlobalLeft(), position, GlobalRight() };
         }
+
+        public string pack()
+        {
+            return "";
+        }
     }
 }

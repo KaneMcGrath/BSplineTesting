@@ -13,13 +13,15 @@ namespace BSplineTesting
     class window : GameWindow
     {
         KaneGameManagerMKII MKII;
-        public window() : base(1280, 1280, OpenTK.Graphics.GraphicsMode.Default, "Test")
+        public window() : base(1920, 1280, OpenTK.Graphics.GraphicsMode.Default, "Test")
         {
-            TargetRenderFrequency = 120;
+            TargetRenderFrequency = 120; 
             TargetUpdateFrequency = 120;
             
             MKII = new KaneGameManagerMKII();
             KaneGameManagerMKII.instance = MKII;
+
+           
         }
         
         
@@ -54,11 +56,16 @@ namespace BSplineTesting
             GL.End();
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            MKII.OnLoad();
+        }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
             MKII.Render();
+            GL.Flush();
             SwapBuffers();
         }
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -72,7 +79,8 @@ namespace BSplineTesting
         protected override void OnResize(EventArgs e)
         {
             GL.Viewport(0, 0, Program.mainWindow.Width, Program.mainWindow.Height);
-            
+            Coordinates.aspectX = ((float)Program.mainWindow.Height / (float)Program.mainWindow.Width);
+            Program.mainWindow.Title = Coordinates.aspectX.ToString();
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)

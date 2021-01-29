@@ -13,6 +13,7 @@ namespace BSplineTesting
         public Color color;
         public bool visible;
         public bool complete;
+        public ViewAngle angle;
 
         public Line(Spline[] splines) 
         {

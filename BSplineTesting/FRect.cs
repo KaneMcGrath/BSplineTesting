@@ -42,5 +42,21 @@ namespace BSplineTesting
         {
             return new Vector2(left + width / 2f, top + height / 2);
         }
+
+        public Vector2[] GetCorners()
+        {
+            return new Vector2[]
+            {
+                new Vector2(left,top),
+                new Vector2(left + width,top),
+                new Vector2(left+width,top+height),
+                new Vector2(left,top+height)
+            };
+        }
+
+        public Vector2 GetCorner(int index)
+        {
+            return GetCorners()[index];
+        }
     }
 }

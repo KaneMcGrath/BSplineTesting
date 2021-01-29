@@ -11,6 +11,79 @@ namespace BSplineTesting
     static class Renderer
     {
 
+        public static void DrawTexture(FRect position, Texture2D tex)
+        {
+            Vector2[] points = Coordinates.ApplyAspect(position).GetCorners();
+            Vector2[] texCoords = {
+                new Vector2(0f,1f),
+                new Vector2(1f,1f),
+                new Vector2(1f,0f),
+                new Vector2(0f,0f)
+                };
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+            GL.BindTexture(TextureTarget.Texture2D, tex.id);
+            GL.Enable(EnableCap.Texture2D);
+            GL.Begin(PrimitiveType.Triangles);
+            GL.Color3(Color.White);
+            GL.TexCoord2(texCoords[0]);
+            GL.Vertex2(points[0]);
+            GL.TexCoord2(texCoords[1]);
+            GL.Vertex2(points[1]);
+            GL.TexCoord2(texCoords[2]);
+            GL.Vertex2(points[2]);
+
+            GL.TexCoord2(texCoords[0]);
+            GL.Vertex2(points[0]);
+            GL.TexCoord2(texCoords[2]);
+            GL.Vertex2(points[2]);
+            GL.TexCoord2(texCoords[3]);
+            GL.Vertex2(points[3]);
+            GL.Color3(Color.White);
+            GL.End();
+            GL.Disable(EnableCap.Blend);
+            GL.Disable(EnableCap.Texture2D);
+        }
+
+        public static void DrawTexture(FRect position, Texture2D tex, FRect UV)
+        {
+            Vector2[] points = Coordinates.ApplyAspect(position).GetCorners();
+            Vector2[] texCoords = {
+                UV.GetCorner(1),
+                UV.GetCorner(2),
+                UV.GetCorner(3),
+                UV.GetCorner(0)
+                };
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+            GL.BindTexture(TextureTarget.Texture2D, tex.id);
+            GL.Enable(EnableCap.Texture2D);
+            GL.Begin(PrimitiveType.Triangles);
+            GL.Color3(Color.White);
+            GL.TexCoord2(texCoords[0]);
+            GL.Vertex2(points[0]);
+            GL.TexCoord2(texCoords[1]);
+            GL.Vertex2(points[1]);
+            GL.TexCoord2(texCoords[2]);
+            GL.Vertex2(points[2]);
+
+            GL.TexCoord2(texCoords[0]);
+            GL.Vertex2(points[0]);
+            GL.TexCoord2(texCoords[2]);
+            GL.Vertex2(points[2]);
+            GL.TexCoord2(texCoords[3]);
+            GL.Vertex2(points[3]);
+            GL.Color3(Color.White);
+            GL.End();
+            GL.Disable(EnableCap.Blend);
+            GL.Disable(EnableCap.Texture2D);
+        }
+
+
         //draws a circle out of lines centered on pos, with rad radius and with res number of points
         public static void LineCircle(Vector2 pos, float rad, int res) 
         {
@@ -54,7 +127,7 @@ namespace BSplineTesting
             GL.Begin(PrimitiveType.LineStrip);
             foreach (Vector2 point in points)
             {
-                GL.Vertex2(point);
+                GL.Vertex2(Coordinates.ApplyAspect(point));
             }
             GL.End();
         }
@@ -66,8 +139,23 @@ namespace BSplineTesting
             GL.Color3(c);
             foreach (Vector2 point in points)
             {
-                GL.Vertex2(point);
+                GL.Vertex2(Coordinates.ApplyAspect(point));
             }
+            GL.Color3(Color.White);
+            GL.End();
+        }
+
+        //draws a rectangle with two triangles because apparently quads were deprecated or something i dont know.
+        public static void drawRect(FRect r, Color c)
+        {
+            GL.Begin(PrimitiveType.Triangles);
+            GL.Color3(c);
+            GL.Vertex2(new Vector2(r.left,r.top));
+            GL.Vertex2(new Vector2(r.left+r.width,r.top + r.height));
+            GL.Vertex2(new Vector2(r.left,r.top + r.height));
+            GL.Vertex2(new Vector2(r.left,r.top));
+            GL.Vertex2(new Vector2(r.left+r.width,r.top));
+            GL.Vertex2(new Vector2(r.left + r.width, r.top + r.height));
             GL.Color3(Color.White);
             GL.End();
         }
@@ -99,6 +187,15 @@ namespace BSplineTesting
             for(int i = 0; i < v.Length - 1; i += 3)
             {
                 drawLine(Bezier.SimpleBezierCurve(v[i], v[i + 1], v[i + 2], v[i + 3], resolution));
+            }
+        }
+        public static void drawLineCurve(Line l, int resolution, Color c)
+        {
+
+            Vector2[] v = l.getPoints();
+            for (int i = 0; i < v.Length - 1; i += 3)
+            {
+                drawLine(Bezier.SimpleBezierCurve(v[i], v[i + 1], v[i + 2], v[i + 3], resolution), c);
             }
         }
         public static void drawShape(Shape s, int resolution)

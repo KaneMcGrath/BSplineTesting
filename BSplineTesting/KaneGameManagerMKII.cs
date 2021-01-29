@@ -11,7 +11,7 @@ namespace BSplineTesting
     class KaneGameManagerMKII
     {
 
-        
+
         Drawing d = new Drawing();
         public static KaneGameManagerMKII instance;
         public Vector2 mOffset = new Vector2();
@@ -20,6 +20,20 @@ namespace BSplineTesting
         public int lineIndex = 0;
         public int mControlPoint = 0;
         public static bool hide;
+
+        public static Texture2D tex;
+
+        private static FRect screenBounds = new FRect(-0.98f, -0.98f, 1.96f, 1.96f);
+        private static Vector2[] screenBoundPoints = new Vector2[]
+        {
+            screenBounds.GetCorner(0),
+            screenBounds.GetCorner(1),
+            screenBounds.GetCorner(2),
+            screenBounds.GetCorner(3),
+            screenBounds.GetCorner(0)
+        };
+
+
 
         public KaneGameManagerMKII()
         {
@@ -32,10 +46,17 @@ namespace BSplineTesting
             int mouseY = IM.MouseY();
 
 
-            Color c = Color.White;
+           
+            Renderer.drawRect(new FRect(-1f, -1f, 2f, 2f), Color.LightCoral);
+            Renderer.DrawTexture(new FRect(0f, 0f, 0.3f, 0.3f), tex, new FRect(0f,0f,1f,1f));
+
+            Renderer.drawLine(screenBoundPoints, Color.Black);
+
+
+            Color c = Color.Black;
             if (IM.GetMouseButton(MouseButton.Left))
             {
-
+                
                 c = Color.Red;
             }
             else
@@ -66,7 +87,7 @@ namespace BSplineTesting
                     {
                         foreach (Spline s in l.splines)
                         {
-                            Renderer.drawSpline(s);
+                            Renderer.drawSpline(s,Color.Black);
                         }
                     }
                     else
@@ -80,9 +101,18 @@ namespace BSplineTesting
             }
             foreach (Line l in d.getLines())
             {
-                Renderer.drawLineCurve(l, 40);
+                Renderer.drawLineCurve(l, 40, Color.Black);
             }
         }
+
+
+
+        public void OnLoad()
+        {
+            tex = Texture2D.LoadTexture("Data/TextAtlas.png");
+        }
+
+
 
         public void Update()
         {
@@ -115,18 +145,31 @@ namespace BSplineTesting
                 d.lines[lineIndex].complete = !d.lines[lineIndex].complete;
             }
 
-            /*
+            
             if (IM.KeyDown(Key.P))
             {
-                string[] s = new string[l.splines.Count];
-
-                for (int i = 0; i < s.Length; i++)
+                if (mHeldSpline != null)
                 {
-                    s[i] = l.splines[i].position.ToString() + l.splines[i].leftPos.ToString() + l.splines[i].rightPos.ToString();
+
+                    
+                    File.WriteAllText("point.txt", VTools.pack(mHeldSpline.position));
                 }
-                File.WriteAllLines("Line.txt", s);
+                
             }
-            */
+            if (IM.KeyDown(Key.L))
+            {
+                    string s = File.ReadAllText("point.txt");
+                    File.WriteAllText("pointRead.txt", VTools.pack(VTools.unpack(s)));
+                
+
+            }
+
+        }
+
+        private Vector2 lastMousePos;
+        private void ClickDrag()
+        {
+            
         }
 
         public void LateUpdate()

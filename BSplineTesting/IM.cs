@@ -155,7 +155,7 @@ namespace BSplineTesting
             int x = Mouse.GetCursorState().X - Program.mainWindow.X;
             if (x < 0) x = 0;
             else if (x > bounds.Width) x = bounds.X + bounds.Width;
-            return x;
+            return (int)(x * Coordinates.aspectX);
         }
 
         public static int MouseY() // gets mouse x position in window pixels
@@ -173,7 +173,7 @@ namespace BSplineTesting
             int x = Mouse.GetCursorState().X - Program.mainWindow.X;
             if (x < 0) x = 0;
             else if (x > bounds.Width) x = bounds.X + bounds.Width;
-            return ((((float)x / Program.mainWindow.Width) - 0.5f) * 2f);
+            return ((((float)x / Program.mainWindow.Width) - 0.5f) * 2f) / Coordinates.aspectX;
         }
 
         public static float FmouseY() // gets mouse x position in absolute Fcoordinates (-1.0 to 1.0)
