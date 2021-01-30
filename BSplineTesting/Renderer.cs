@@ -51,9 +51,9 @@ namespace BSplineTesting
         {
             Vector2[] points = Coordinates.ApplyAspect(position).GetCorners();
             Vector2[] texCoords = {
-                UV.GetCorner(1),
-                UV.GetCorner(2),
                 UV.GetCorner(3),
+                UV.GetCorner(2),
+                UV.GetCorner(1),
                 UV.GetCorner(0)
                 };
 

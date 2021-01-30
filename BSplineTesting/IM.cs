@@ -19,6 +19,7 @@ namespace BSplineTesting
         private static Dictionary<MouseButton, bool> mouseButtons = new Dictionary<MouseButton, bool>();
         private static Dictionary<MouseButton, bool> downMouseButtons = new Dictionary<MouseButton, bool>();
 
+        public static char lastTyped;
 
         static IM()
         {
@@ -54,6 +55,9 @@ namespace BSplineTesting
             if (!pressedKeys[k])
                 DownKeys[k] = true;
             pressedKeys[k] = true;
+
+            KaneGameManagerMKII.instance.onKeyPressed(k.ToString()); 
+
         }
         public static void OnKeyUp(Key k)
         {

@@ -21,7 +21,26 @@ namespace BSplineTesting
         public int mControlPoint = 0;
         public static bool hide;
 
-        public static Texture2D tex;
+
+        private class stampLetter
+        {
+            public static List<stampLetter> stamps = new List<stampLetter>();
+            public Vector2 pos;
+            public string value;
+
+            public stampLetter(Vector2 vector, string c)
+            {
+                pos = vector;
+                value = c;
+            }
+        }
+
+
+        public void onKeyPressed(string c)
+        {
+            //stampLetter.stamps.Add(new stampLetter(IM.FmouseVec(), c));
+        }
+
 
         private static FRect screenBounds = new FRect(-0.98f, -0.98f, 1.96f, 1.96f);
         private static Vector2[] screenBoundPoints = new Vector2[]
@@ -48,20 +67,34 @@ namespace BSplineTesting
 
            
             Renderer.drawRect(new FRect(-1f, -1f, 2f, 2f), Color.LightCoral);
-            Renderer.DrawTexture(new FRect(0f, 0f, 0.3f, 0.3f), tex, new FRect(0f,0f,1f,1f));
-
             Renderer.drawLine(screenBoundPoints, Color.Black);
+
+            Text.DrawString(new Vector2(-0.9f, 0.3f), 0.03f, "Testing do you read!");
+            Text.DrawString(new Vector2(-0.9f, 0.27f), 0.03f, "Holy Shit! there is no fucking way that worked first try.  Right?");
+            Text.DrawString(new Vector2(-0.9f, 0.24f), 0.03f, "Something just has to be broken");
+            Text.DrawString(new Vector2(-0.9f, 0.20f), 0.03f, "You cant Handle this char ((\"\'/ 2 \\\'\"))");
+            Text.DrawString(new Vector2(-0.9f, -0.20f), 0.03f, "Fixing those Errors were suspiciously easy?");
+            Text.DrawString(new Vector2(-0.9f, -0.23f), 0.03f, "I can now use all kinds of special charecters");
+            Text.DrawString(new Vector2(-0.9f, -0.26f), 0.03f, "Like < or % or = or _ or + or ☺ or ♦ or even ◘");
+            Text.DrawString(new Vector2(-0.9f, -0.36f), 0.03f, "Mouse x = " + Math.Round(IM.FmouseX(), 2).ToString());
+            Text.DrawString(new Vector2(-0.9f, -0.39f), 0.03f, "Mouse y = " + Math.Round(IM.FmouseY(), 2).ToString());
+
+            if (stampLetter.stamps.Count > 0)
+            {
+                foreach (stampLetter s in stampLetter.stamps)
+                {
+                    Text.DrawString(s.pos, 0.05f, s.value.ToString());
+                }
+            }
 
 
             Color c = Color.Black;
             if (IM.GetMouseButton(MouseButton.Left))
             {
-                
                 c = Color.Red;
             }
             else
             {
-                
                 foreach (Line l in d.getLines())
                 {
                     foreach (Spline s in l.splines)
@@ -71,7 +104,6 @@ namespace BSplineTesting
                             c = Color.Magenta;
                         }
                     }
-                   
                 }
 
             }
@@ -106,12 +138,13 @@ namespace BSplineTesting
         }
 
 
-
         public void OnLoad()
         {
-            tex = Texture2D.LoadTexture("Data/TextAtlas.png");
+            
+            Text.fullAtlas = Texture2D.LoadTexture("Data/FullAtlas.png");
+        
+            
         }
-
 
 
         public void Update()
