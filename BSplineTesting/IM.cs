@@ -13,13 +13,62 @@ namespace BSplineTesting
         //Dictionarys for 3 states of each key
         //Down and up keys should be set true at the beginning of the Update, and set false at the end in LateUpdate
         //Although im not sure how the up keys will work like that so for those i'll just set it on the event and hope for the best
-        private static Dictionary<Key, bool> pressedKeys = new Dictionary<Key, bool>();
-        private static Dictionary<Key, bool> DownKeys = new Dictionary<Key, bool>();
-        private static Dictionary<Key, bool> UpKeys = new Dictionary<Key, bool>();
-        private static Dictionary<MouseButton, bool> mouseButtons = new Dictionary<MouseButton, bool>();
-        private static Dictionary<MouseButton, bool> downMouseButtons = new Dictionary<MouseButton, bool>();
+
+        //private static Dictionary<Key, bool> pressedKeys = new Dictionary<Key, bool>();
+        //private static Dictionary<Key, bool> DownKeys = new Dictionary<Key, bool>();
+        //private static Dictionary<Key, bool> UpKeys = new Dictionary<Key, bool>();
+        //private static Dictionary<MouseButton, bool> mouseButtons = new Dictionary<MouseButton, bool>();
+        //private static Dictionary<MouseButton, bool> downMouseButtons = new Dictionary<MouseButton, bool>();
+
+        private static Dictionary<Key, KeySettings> keys = new Dictionary<Key, KeySettings>();
+        private static Dictionary<MouseButton, MBSettings> mouseButtons = new Dictionary<MouseButton, MBSettings>();
 
         public static char lastTyped;
+
+        class KeySettings
+        {
+            public KeySettings(Key key)
+            {
+                this.key = key;
+                pressed = false;
+                queueDown = false;
+                down = false;
+                queueUp = false;
+                up = false;
+            }
+
+            public Key key;
+            
+            public bool pressed;
+            public bool queueDown;
+            public bool down;
+            public bool queueUp;
+            public bool up;
+            
+            
+        }
+
+        class MBSettings
+        {
+            public MBSettings(MouseButton button)
+            {
+                this.button = button;
+                pressed = false;
+                queueDown = false;
+                down = false;
+                queueUp = false;
+                up = false;
+            }
+            public MouseButton button;
+
+            public bool pressed;
+            public bool queueDown;
+            public bool down;
+            public bool queueUp;
+            public bool up;
+
+        }
+
 
         static IM()
         {
@@ -34,17 +83,11 @@ namespace BSplineTesting
             var allMouse = Enum.GetValues(typeof(MouseButton)).Cast<MouseButton>();
             foreach (Key k in allKeys)
             {
-                if (!pressedKeys.ContainsKey(k)) pressedKeys.Add(k, false);
-                if (!DownKeys.ContainsKey(k)) DownKeys.Add(k, false);
-                if (!UpKeys.ContainsKey(k)) UpKeys.Add(k, false);
-
+                if (!keys.ContainsKey(k)) keys.Add(k, new KeySettings(k));
             }
             foreach (MouseButton b in allMouse)
             {
-                if (!mouseButtons.ContainsKey(b)) mouseButtons.Add(b, false);
-                if (!downMouseButtons.ContainsKey(b)) downMouseButtons.Add(b, false);
-                
-
+                if (!mouseButtons.ContainsKey(b)) mouseButtons.Add(b, new MBSettings(b));
             }
         }
 
@@ -52,26 +95,27 @@ namespace BSplineTesting
         //gets key down and key up events from the window
         public static void OnKeyDown(Key k)
         {
-            if (!pressedKeys[k])
-                DownKeys[k] = true;
-            pressedKeys[k] = true;
+            if (!keys[k].pressed)
+                keys[k].queueDown = true;
+            keys[k].pressed = true;
 
-            KaneGameManagerMKII.instance.onKeyPressed(k.ToString()); 
-
+            KaneGameManagerMKII.instance.onKeyPressed(k.ToString());
         }
         public static void OnKeyUp(Key k)
         {
-            pressedKeys[k] = false;
+            keys[k].pressed = false;
+            keys[k].queueUp = true;
         }
         public static void OnMouseButtonDown(MouseButton b)
         {
-            if (!mouseButtons[b])
-                downMouseButtons[b] = true;
-            mouseButtons[b] = true;
+            if (!mouseButtons[b].pressed)
+                mouseButtons[b].queueDown = true;
+            mouseButtons[b].pressed = true;
         }
         public static void OnMouseButtonUp(MouseButton b)
         {
-            mouseButtons[b] = false;
+            mouseButtons[b].pressed = false;
+            mouseButtons[b].queueUp = true;
         }
 
 
@@ -80,35 +124,62 @@ namespace BSplineTesting
         //sets down keys if they are pressed
         public static void Update()
         {
-           // foreach (Key k in pressedKeys.Keys.ToArray())
-            
-            
+            // foreach (Key k in pressedKeys.Keys.ToArray())
+
+            foreach (Key k in keys.Keys.ToArray())
+            {
+                if (keys[k].queueDown)
+                {
+                    keys[k].queueDown = false;
+                    keys[k].down = true;
+                }
+                if (keys[k].queueUp)
+                {
+                    keys[k].queueUp = false;
+                    keys[k].up = true;
+                }
+            }
+            foreach (MouseButton b in mouseButtons.Keys.ToArray())
+            {
+                if (mouseButtons[b].queueDown)
+                {
+                    mouseButtons[b].queueDown = false;
+                    mouseButtons[b].down = true;
+                }
+                if (mouseButtons[b].queueUp)
+                {
+                    mouseButtons[b].queueUp = false;
+                    mouseButtons[b].up = true;
+                }
+            }
+
         }
 
 
         //called after game manager update
         //sets down and upkeys to false
-        public static void LateUpdate()
+        public static void PostRender()
         {
-            foreach (Key k in DownKeys.Keys.ToArray())
+            foreach (Key k in keys.Keys.ToArray())
             {
-                if (DownKeys[k])
+                if (keys[k].down)
                 {
-                    DownKeys[k] = false;
+                    keys[k].down = false;
+                }
+                if (keys[k].up)
+                {
+                    keys[k].up = false;
                 }
             }
-            foreach (MouseButton b in downMouseButtons.Keys.ToArray())
+            foreach (MouseButton b in mouseButtons.Keys.ToArray())
             {
-                if (downMouseButtons[b])
+                if (mouseButtons[b].down)
                 {
-                    downMouseButtons[b] = false;
+                    mouseButtons[b].down = false;
                 }
-            }
-            foreach (Key k in UpKeys.Keys.ToArray())
-            {
-                if (UpKeys[k])
+                if (mouseButtons[b].up)
                 {
-                    UpKeys[k] = false;
+                    mouseButtons[b].up = false;
                 }
             }
         }
@@ -120,37 +191,34 @@ namespace BSplineTesting
         //returns true if a key is held down
         public static bool GetKey(Key k)
         {
-            return pressedKeys[k];
+            return keys[k].pressed;
         }
 
         //returns true if the key was pressed down on this frame
         public static bool KeyDown(Key k)
         {
-            return DownKeys[k];
+            return keys[k].down;
         }
 
         //returns true if the key is released on this frame although might not be exact due to the implementation
         public static bool KeyUp(Key k)
         {
-            return UpKeys[k];
+            return keys[k].up;
         }
 
         public static bool MouseButtonDown(MouseButton b)
         {
-
-            return downMouseButtons[b];
+            return mouseButtons[b].down;
         }
 
         public static bool MouseButtonUp(MouseButton b)
         {
-
-            return true;
+            return mouseButtons[b].up;
         }
 
         public static bool GetMouseButton(MouseButton b)
         {
-
-            return mouseButtons[b];
+            return mouseButtons[b].pressed;
         }
 
         public static int MouseX() // gets mouse x position in window pixels
@@ -205,8 +273,17 @@ namespace BSplineTesting
         {
             float x = FmouseX();
             float y = FmouseY();
-            if (x > rect.left && x < rect.left + rect.width && y > rect.top && y < rect.top + rect.height) return true;
+
+            FRect r = !rect.shouldAdjustToAspect ? Coordinates.RemoveAspect(rect) : rect;
+
+            if (x > r.left && x < r.left + r.width && y > r.top && y < r.top + r.height) return true;
             return false;
+        }
+
+        public static bool isMouseInRect(Rectangle rectangle)
+        {
+            FRect r = Coordinates.RectToFRect(rectangle);
+            return FisMouseInRect(r);
         }
     }
 }

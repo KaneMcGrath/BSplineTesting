@@ -74,6 +74,21 @@ namespace BSplineTesting
                 leftPos = new Vector2(-((rightPos.X / d) * d1), -((rightPos.Y / d) * d1));
             }
         }
+
+        public void moveControlPointLocked(Vector2 pos, bool left)
+        {
+            if (left)
+            {
+                leftPos = new Vector2(pos.X - position.X, pos.Y - position.Y);
+                rightPos = new Vector2(-(pos.X - position.X), -(pos.Y - position.Y));
+            }
+            else
+            {
+                rightPos = new Vector2(pos.X - position.X, pos.Y - position.Y);
+                leftPos = new Vector2(-(pos.X - position.X), -(pos.Y - position.Y));
+            }
+        }
+
         public Vector2 GlobalLeft()
         {
             return new Vector2(position.X + leftPos.X, position.Y + leftPos.Y);

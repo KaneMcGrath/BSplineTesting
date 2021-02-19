@@ -10,8 +10,6 @@ namespace BSplineTesting
 {
     class KaneGameManagerMKII
     {
-
-
         Drawing d = new Drawing();
         public static KaneGameManagerMKII instance;
         public Vector2 mOffset = new Vector2();
@@ -20,6 +18,8 @@ namespace BSplineTesting
         public int lineIndex = 0;
         public int mControlPoint = 0;
         public static bool hide;
+        private static bool lockControlPoint;
+        private static Color backgroundColor = Color.FromArgb(150, 100, 80);
 
 
         private class stampLetter
@@ -52,6 +52,16 @@ namespace BSplineTesting
             screenBounds.GetCorner(0)
         };
 
+        private static FRect screenBounds2 = new FRect(-1f, -1f, 2f, 2f);
+        private static Vector2[] screenBound2Points = new Vector2[]
+        {
+            screenBounds2.GetCorner(0),
+            screenBounds2.GetCorner(1),
+            screenBounds2.GetCorner(2),
+            screenBounds2.GetCorner(3),
+            screenBounds2.GetCorner(0)
+        };
+
 
 
         public KaneGameManagerMKII()
@@ -63,21 +73,42 @@ namespace BSplineTesting
         {
             int mouseX = IM.MouseX();
             int mouseY = IM.MouseY();
+           
+            Renderer.drawRect(new FRect(-1f, -1f, 2f, 2f, false), backgroundColor);
+            Renderer.drawLine(screenBoundPoints, Color.Black);
+            Renderer.drawLine(screenBound2Points, Color.Black);
+
+            Rectangle rt = new Rectangle(100, 100, 200, 50);
+            FRect fr = Coordinates.RectToFRect(rt);
+            FRect r = fr.shouldAdjustToAspect ? Coordinates.ApplyAspect(fr) : fr;
+            Renderer.LineCircle(new Vector2(r.left, r.top), 0.01f, 10, Color.BlueViolet);
+            //FlatUI.GUI.OutlineBox(Text.DrawStringR(new Vector2(-0.5f, 0f), 0.5f, "Make a good rect for me here! ♥", Color.Crimson));
+            
+
+
+
+            if (FlatUI.button(rt, "test button"))
+            {
+                Random ra = new Random();
+   
+                backgroundColor = Color.FromArgb(ra.Next(0, 255), ra.Next(0, 255), ra.Next(0, 255));
+            }
+
 
 
            
-            Renderer.drawRect(new FRect(-1f, -1f, 2f, 2f), Color.LightCoral);
-            Renderer.drawLine(screenBoundPoints, Color.Black);
+            
+            
+            Text.DrawString(new Vector2(-0.3f, -0.5f), 0.5f, "Hello this is a test");
+            Text.DrawString(new Vector2(-0.3f, -0.6f), 0.5f, "Please work as intended");
+            Text.DrawString(new Vector2(-0.3f, 0.6f), 0.5f, "Mouse Left: " + IM.GetMouseButton(MouseButton.Left).ToString());
+            Text.DrawString(new Vector2(-0.3f, 0.7f), 0.5f, "Mouse Left Down: " + IM.MouseButtonDown(MouseButton.Left).ToString());
+            Text.DrawString(new Vector2(-0.3f, 0.8f), 0.5f, "Mouse Left Up: " + IM.MouseButtonUp(MouseButton.Left).ToString());
 
-            Text.DrawString(new Vector2(-0.9f, 0.3f), 0.03f, "Testing do you read!");
-            Text.DrawString(new Vector2(-0.9f, 0.27f), 0.03f, "Holy Shit! there is no fucking way that worked first try.  Right?");
-            Text.DrawString(new Vector2(-0.9f, 0.24f), 0.03f, "Something just has to be broken");
-            Text.DrawString(new Vector2(-0.9f, 0.20f), 0.03f, "You cant Handle this char ((\"\'/ 2 \\\'\"))");
-            Text.DrawString(new Vector2(-0.9f, -0.20f), 0.03f, "Fixing those Errors were suspiciously easy?");
-            Text.DrawString(new Vector2(-0.9f, -0.23f), 0.03f, "I can now use all kinds of special charecters");
-            Text.DrawString(new Vector2(-0.9f, -0.26f), 0.03f, "Like < or % or = or _ or + or ☺ or ♦ or even ◘");
-            Text.DrawString(new Vector2(-0.9f, -0.36f), 0.03f, "Mouse x = " + Math.Round(IM.FmouseX(), 2).ToString());
-            Text.DrawString(new Vector2(-0.9f, -0.39f), 0.03f, "Mouse y = " + Math.Round(IM.FmouseY(), 2).ToString());
+
+
+            Text.DrawString(IM.FmouseVec(), 0.5f, "(" + Math.Round(IM.FmouseX(), 2).ToString() + "," + Math.Round(IM.FmouseY(), 2).ToString() + ")");
+        
 
             if (stampLetter.stamps.Count > 0)
             {
@@ -140,10 +171,7 @@ namespace BSplineTesting
 
         public void OnLoad()
         {
-            
             Text.fullAtlas = Texture2D.LoadTexture("Data/FullAtlas.png");
-        
-            
         }
 
 
@@ -177,24 +205,26 @@ namespace BSplineTesting
             {
                 d.lines[lineIndex].complete = !d.lines[lineIndex].complete;
             }
+            if (IM.KeyDown(Key.ShiftLeft))
+            {
+                lockControlPoint = true;
+            }
+            if (IM.KeyUp(Key.ShiftLeft))
+            {
+                lockControlPoint = false;
+            }
 
-            
             if (IM.KeyDown(Key.P))
             {
                 if (mHeldSpline != null)
                 {
-
-                    
                     File.WriteAllText("point.txt", VTools.pack(mHeldSpline.position));
                 }
-                
             }
             if (IM.KeyDown(Key.L))
             {
                     string s = File.ReadAllText("point.txt");
                     File.WriteAllText("pointRead.txt", VTools.pack(VTools.unpack(s)));
-                
-
             }
 
         }
@@ -214,7 +244,6 @@ namespace BSplineTesting
         {
             if (mHeldSpline != null)
             {
-                
                 if (IM.GetMouseButton(MouseButton.Left))
                 {
                     if (mControlPoint == 0)
@@ -223,11 +252,25 @@ namespace BSplineTesting
                     }
                     else if (mControlPoint == 1)
                     {
-                        mHeldSpline.moveControlPoint(new Vector2(IM.FmouseX() + mOffset.X, IM.FmouseY() + mOffset.Y), true);
+                        if (lockControlPoint)
+                        {
+                            mHeldSpline.moveControlPointLocked(new Vector2(IM.FmouseX() + mOffset.X, IM.FmouseY() + mOffset.Y), true);
+                        }
+                        else
+                        {
+                            mHeldSpline.moveControlPoint(new Vector2(IM.FmouseX() + mOffset.X, IM.FmouseY() + mOffset.Y), true);
+                        }
                     }
                     else
                     {
-                        mHeldSpline.moveControlPoint(new Vector2(IM.FmouseX() + mOffset.X, IM.FmouseY() + mOffset.Y), false);
+                        if (lockControlPoint)
+                        {
+                            mHeldSpline.moveControlPointLocked(new Vector2(IM.FmouseX() + mOffset.X, IM.FmouseY() + mOffset.Y), false);
+                        }
+                        else
+                        {
+                            mHeldSpline.moveControlPoint(new Vector2(IM.FmouseX() + mOffset.X, IM.FmouseY() + mOffset.Y), false);
+                        }
                     }
                 }
                 else
@@ -241,7 +284,6 @@ namespace BSplineTesting
             {
                 foreach (Spline s in l.splines)
                 {
-
                     if (IM.MouseButtonDown(MouseButton.Left))
                     {
                         if (IM.FisMouseInRect(new FRect(s.GlobalLeft(), 0.04f)))

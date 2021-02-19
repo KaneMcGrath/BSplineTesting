@@ -47,7 +47,7 @@ namespace BSplineTesting
             GL.Disable(EnableCap.Texture2D);
         }
 
-        public static void DrawTexture(FRect position, Texture2D tex, FRect UV)
+        public static void DrawTexture(FRect position, Texture2D tex, FRect UV, Color color)
         {
             Vector2[] points = Coordinates.ApplyAspect(position).GetCorners();
             Vector2[] texCoords = {
@@ -63,7 +63,7 @@ namespace BSplineTesting
             GL.BindTexture(TextureTarget.Texture2D, tex.id);
             GL.Enable(EnableCap.Texture2D);
             GL.Begin(PrimitiveType.Triangles);
-            GL.Color3(Color.White);
+            GL.Color3(color);
             GL.TexCoord2(texCoords[0]);
             GL.Vertex2(points[0]);
             GL.TexCoord2(texCoords[1]);
@@ -85,7 +85,7 @@ namespace BSplineTesting
 
 
         //draws a circle out of lines centered on pos, with rad radius and with res number of points
-        public static void LineCircle(Vector2 pos, float rad, int res) 
+        public static void LineCircle(Vector2 pos, float rad, int res, bool aspect = true) 
         {
 
             Vector2[] points = new Vector2[res + 1];
@@ -99,11 +99,11 @@ namespace BSplineTesting
                 double y = pos.Y + rad * Math.Sin(t);
                 points[i] = new Vector2((float)x, (float)y);
             }
-            drawLine(points);
+            drawLine(points, aspect);
         }
 
         //draws a circle out of lines centered on pos, with rad radius and with res number of points
-        public static void LineCircle(Vector2 pos, float rad, int res, Color c) 
+        public static void LineCircle(Vector2 pos, float rad, int res, Color c, bool aspect = true) 
         {
 
             Vector2[] points = new Vector2[res + 1];
@@ -117,37 +117,40 @@ namespace BSplineTesting
                 double y = pos.Y + rad * Math.Sin(t);
                 points[i] = new Vector2((float)x, (float)y);
             }
-            drawLine(points, c);
+            drawLine(points, c, aspect);
         }
 
 
         //Draws a connected line segment between points
-        public static void drawLine(Vector2[] points) 
+        public static void drawLine(Vector2[] points, bool aspect = true) 
         {
             GL.Begin(PrimitiveType.LineStrip);
+            
             foreach (Vector2 point in points)
             {
-                GL.Vertex2(Coordinates.ApplyAspect(point));
+                GL.Vertex2(aspect ? Coordinates.ApplyAspect(point) : point);
             }
             GL.End();
         }
 
         //Draws a connected line segment between points now in color
-        public static void drawLine(Vector2[] points,Color c) 
+        public static void drawLine(Vector2[] points,Color c, bool aspect = true) 
         {
             GL.Begin(PrimitiveType.LineStrip);
             GL.Color3(c);
             foreach (Vector2 point in points)
             {
-                GL.Vertex2(Coordinates.ApplyAspect(point));
+                GL.Vertex2(aspect ? Coordinates.ApplyAspect(point) : point);
             }
             GL.Color3(Color.White);
             GL.End();
         }
 
         //draws a rectangle with two triangles because apparently quads were deprecated or something i dont know.
-        public static void drawRect(FRect r, Color c)
+        public static void drawRect(FRect rect, Color c)
         {
+
+            FRect r = rect.shouldAdjustToAspect ? Coordinates.ApplyAspect(rect) : rect;
             GL.Begin(PrimitiveType.Triangles);
             GL.Color3(c);
             GL.Vertex2(new Vector2(r.left,r.top));
